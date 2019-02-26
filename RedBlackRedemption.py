@@ -1,5 +1,8 @@
 from queue import Queue, Empty
 from enum import Enum
+from itertools import permutations, islice
+import random
+import sys
 
 class Color(Enum):
     R = 1
@@ -8,6 +11,7 @@ class Color(Enum):
 class Side(Enum):
     RIGHT = 1
     LEFT = 2
+
 
 class Node:
     def __init__(self, value):
@@ -78,6 +82,19 @@ class Node:
            return self.color.name
 
 class Tree:
+
+    def height(self, node):
+        if node is None:
+            return 0
+        else:
+            return 1 + max(self.height(node.left), self.height(node.right))
+
+    def minHeight(self, node):
+        if node is None:
+            return 0
+        else:
+            return 1 + min(self.minHeight(node.left), self.minHeight(node.right))
+
     def __init__(self):
         self.root = None
         pass
@@ -175,7 +192,8 @@ class Tree:
                 return node, side
             else:
                 node.value = toReplace.value
-                node = toReplace        
+                node = toReplace  
+        return None, None
 
 class RBTree(Tree):
     def __init__(self):
@@ -184,7 +202,11 @@ class RBTree(Tree):
     def remove(self, x):
         deletedNode, side = super().remove(x)
         x = deletedNode
-        while not x == self.root : #jeśli jest czerwony to nic nie rób
+
+        if self.root is None:
+            return
+
+        while not x == self.root and x is not None: #jeśli jest korzeniem to nic nie rób
             if x.color == Color.R: #przypadek 0, węzeł x jest czerwony
                 x.color = Color.B
                 break
@@ -196,7 +218,7 @@ class RBTree(Tree):
                 leftNephewColor = Color.B
                 rightNephewColor = Color.B
                 if brother is not None:
-                    brotherColor = Color.B
+                    brotherColor = brother.color
                     if brother.left is not None:
                         leftNephewColor = brother.left.color
                     if brother.right is not None:
@@ -228,7 +250,7 @@ class RBTree(Tree):
                 leftNephewColor = Color.B
                 rightNephewColor = Color.B
                 if brother is not None:
-                    brotherColor = Color.B
+                    brotherColor = brother.color
                     if brother.left is not None:
                         leftNephewColor = brother.left.color
                     if brother.right is not None:
@@ -317,14 +339,64 @@ tree.add(4)
 tree.add(5)
 tree.add(6)
 tree.add(7)
+
 tree.add(8)
 tree.add(9)
+tree.add(10)
+tree.add(11)
 
+print("Sample tree: ")
 print(tree)
-tree.remove(5)
+
+tree.remove(1)
+tree.remove(4)
+tree.remove(12)
+tree.remove(6)
+
+print("After removing: ")
 print(tree)
-tree.remove(9)
-print(tree)
-tree.remove(2)
-print(tree)
+
+tree = RBTree()
+
+def getRandomPermutation(size):
+    print("Generating random permutation...")
+    tempList = list(range(size))
+    outputList = []
+    while len(tempList) > 0:
+        index = random.randint(0, len(tempList) - 1)
+        x = tempList.pop(index)
+        outputList.append(x)
+    return outputList
+
+
+testValue = 100000
+showTree = False
+if len(sys.argv) > 1:
+    testValue = int(sys.argv[1])
+    showTree = testValue <= 100
+
+
+test_array = getRandomPermutation(testValue)
+
+print("Adding elements to tree...")
+for i in test_array:
+    tree.add(i)
+
+
+print("Maximal length path: " + str(tree.height(tree.root)))
+print("Minimal length path: " + str(tree.minHeight(tree.root)))
+if showTree:
+    print(tree)
+
+
+del_array = getRandomPermutation(testValue)[:testValue//2]
+
+print("Removing elements from tree...")
+for i in del_array:
+    tree.remove(i)
+
+print("Maximal length path: " + str(tree.height(tree.root)))
+print("Minimal length path: " + str(tree.minHeight(tree.root)))
+if showTree:
+    print(tree)
 
