@@ -70,11 +70,13 @@ def create_encode_dict(root):
     dfs(root, "")
     return encode_dict
 
-def encode_text(text, encode_dict): # this method works only for single letter encoding
+
+def encode_text(text, encode_dict):  # this method works only for single letter encoding
     output_string = ""
     for c in text:
         output_string += encode_dict[c]
     return output_string
+
 
 def size_encoded(freqs, encode_dict):
     sum = 0
@@ -83,36 +85,30 @@ def size_encoded(freqs, encode_dict):
     return sum
 
 
-freqs = dict()
-# text = sys.argv[1]
-text = "12121327632768133178471326417263417862356123487163471234871326471632473541723641252743861273854125316417632541754187438711327654800023418763248176417863418172531234132401320410234102350230452034035600451023512341732415276341573261524"
-for c in text:
-    if c in freqs:
-        freqs[c] += 1
-    else:
-        freqs[c] = 1
+def count_freq(text, chunk_size=1):
+    freqs = dict()
+    for c in range(0, len(text), chunk_size):
+        key = text[c:c + chunk_size]
+        if key in freqs:
+            freqs[key] += 1
+        else:
+            freqs[key] = 1
+    return freqs
 
-nodes = [Node(freqs[key], key) for key in freqs]
-queue = PQueue(nodes)
-root = queue.huffman_tree()
-single_letter_dict = create_encode_dict(root)
+def stats(text, chunk_size):
+    freqs = count_freq(text, chunk_size)
+    nodes = [Node(freqs[key], key) for key in freqs]
+    queue = PQueue(nodes)
+    root = queue.huffman_tree()
+    enc_dict = create_encode_dict(root)
+    print(freqs)
+    print(enc_dict)
+    print(size_encoded(freqs, enc_dict))
 
-freqs_v2 = dict()
-for c in range(0, len(text), 2):
-    key = text[c:c+2]
-    if key in freqs_v2:
-        freqs_v2[key] += 1
-    else:
-        freqs_v2[key] = 1
-nodes_v2 = [Node(freqs_v2[key], key) for key in freqs_v2]
-queue_v2 = PQueue(nodes_v2)
-root_v2 = queue_v2.huffman_tree()
-two_letter_dict = create_encode_dict(root_v2)
-print("Słownik jednoliterowy"+str(single_letter_dict))
-print("Słownik dwuliterowy"+str(two_letter_dict))
+text = sys.argv[1]
+# text = "112401370346023460207502560200103240235020634507350605041034103530640760745004102410402450260370560245010412041230412341234024603560470357056034501350236026240525234523"
 
-
-print(size_encoded(freqs, single_letter_dict))
-print(size_encoded(freqs_v2, two_letter_dict))
+for i in range(1, 3):
+    stats(text, i)
 
 
