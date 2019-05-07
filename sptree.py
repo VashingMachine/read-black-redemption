@@ -65,3 +65,7 @@ def test_tree():
 
     for v in values:
         print(v)
+
+
+if __name__ == "__main__":
+    test_tree()
